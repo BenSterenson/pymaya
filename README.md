@@ -1,0 +1,1 @@
+# pymaya intract with https://maya.tase.co.il/
