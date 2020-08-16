@@ -1,62 +1,63 @@
+from logging import Logger
 from typing import List, Dict
 from datetime import date
-from logging import Logger
-import traceback
-import time
 
-import requests
 from requests import Session
 
-from pymaya.request_classes.maya_historical_request import MayaBaseRequest
-from pymaya.request_classes.maya_historical_request import MayaHistoricalRequest
-from pymaya.utils import get_logger, streamify
-from pymaya.exceptions import BadResponseException
+from pymaya.maya_funds import MayaFunds
+from pymaya.maya_security import MayaSecurity
 
 
 class Maya:
 
     def __init__(self, logger: Logger = None, num_of_attempts: int = 1, session: Session = Session(),
-                 verify: bool = True):
-        self.logger = get_logger(self.__class__.__name__) if logger is None else logger
-        self.num_of_attempts = num_of_attempts
-        self.session = session
-        self.verify = verify
+                 verify: bool = True, cachesize: int = 128):
 
-    def get_response(self, maya_api_request: MayaBaseRequest):
-        response = None
+        self.maya_securities = MayaSecurity(logger=logger,
+                                            num_of_attempts=num_of_attempts,
+                                            session=session,
+                                            verify=verify,
+                                            cachesize=cachesize)
 
-        for attempt in range(self.num_of_attempts):
-            response = self.session.send(request=maya_api_request.prepare(), verify=self.verify)
+        self.maya_funds = MayaFunds(logger=logger,
+                                    num_of_attempts=num_of_attempts,
+                                    session=session,
+                                    verify=verify,
+                                    cachesize=cachesize)
 
-            if response.status_code != requests.codes.ok:
-                self.logger.info('response error attempt: {}'.format(attempt + 1 / self.num_of_attempts))
-                self.logger.info('status response code {}, reason {}'.format(response.status_code, response.reason))
-                self.logger.info('try again in 1 sec...')
-                time.sleep(1)
+        self.mapped_securities = {}
+        self.map_securities()
 
+    def get_all_securities(self, lang: int = 1):
+        return self.maya_securities.get_all_securities(lang)
+
+    def map_securities(self):
+        all_securities = self.get_all_securities()
+        for security in all_securities:
+            if security.get("Id") in self.mapped_securities:
+                self.mapped_securities[security.get("Id")].add(security.get("Type"))
             else:
-                return response
-        return response
+                self.mapped_securities[security.get("Id")] = {(security.get("Type"))}
 
-    def _send_request(self, maya_api_request: MayaBaseRequest) -> Dict:
-        try:
-            response = self.get_response(maya_api_request=maya_api_request)
+    def get_maya_class(self, security_id: str):
+        if MayaFunds.TYPE in self.mapped_securities.get(security_id):
+            return self.maya_funds
+        else:
+            return self.maya_securities
 
-            if response.status_code != requests.codes.ok:
-                self.logger.error('Error in API call [{}] - {}'.format(response.status_code, response.reason))
-                raise BadResponseException(status_code=response.status_code, reason=response.reason, url=response.url,
-                                           method=response.request.method)
+    def get_details(self, security_id: str):
+        maya_class = self.get_maya_class(security_id)
+        return maya_class.get_details(security_id)
 
-            return response.json()
+    def get_price_history_chunk(self, security_id: str, from_data: date, to_date: date, page: int) -> Dict:
+        maya_class = self.get_maya_class(security_id)
+        return maya_class.get_price_history_chunk(security_id,
+                                                  from_data=from_data,
+                                                  to_date=to_date, page=page)
 
-        except Exception as e:
-            self.logger.error('Error {}, traceback: {}'.format(e, traceback.format_exc()))
-            raise
+    def get_price_history(self, security_id: str, from_data: date, to_date: date = date.today(), page: int = 1) -> List[Dict]:
+        maya_class = self.get_maya_class(security_id)
+        return maya_class.get_price_history(security_id,
+                                            from_data=from_data,
+                                            to_date=to_date, page=page)
 
-    def get_price_history_chunk(self, fund_id: int, from_data: date, to_date: date, page: int) -> Dict:
-        return self._send_request(MayaHistoricalRequest(fund_id, from_data, to_date, page))
-
-    @streamify
-    def get_price_history(self, fund_id: int, from_data: date, to_date: date = date.today(), page: int = 1) -> List[Dict]:
-        data = self.get_price_history_chunk(fund_id, from_data, to_date, page)
-        return data.get("Table", [])

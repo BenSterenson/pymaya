@@ -2,16 +2,21 @@ from abc import ABC, abstractmethod
 
 from urllib.parse import urljoin
 
+from fake_useragent import UserAgent
 import requests
 
 
 class MayaBaseRequest(ABC):
-    MAYA_API_BASE_URL = 'https://mayaapi.tase.co.il/api/'
 
     def __init__(self, *args, **kwargs):
         self.request = requests.Request(self.method, **kwargs)
         self.request.headers['Cache-Control'] = 'no-cache'
-        self.request.headers['X-Maya-With'] = "allow"
+        self.request.headers['User-Agent'] = UserAgent(verify_ssl=False).chrome
+
+    @property
+    @abstractmethod
+    def maya_api_base_url(self):
+        pass
 
     @property
     @abstractmethod
@@ -24,7 +29,7 @@ class MayaBaseRequest(ABC):
         pass
 
     def _get_url(self) -> str:
-        return urljoin(self.MAYA_API_BASE_URL, self.end_point)
+        return urljoin(self.maya_api_base_url, self.end_point)
 
     def prepare(self) -> requests.PreparedRequest:
         self.request.url = self._get_url()

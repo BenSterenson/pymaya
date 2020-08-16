@@ -23,4 +23,3 @@ def get_logger(logger_name) -> Logger:
     logger.addHandler(stream_handler)
     logger.setLevel(logging.DEBUG)
     return logger
-
