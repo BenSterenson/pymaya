@@ -2,6 +2,7 @@
 - https://maya.tase.co.il/
 - https://api.tase.co.il/
 
+pip install pymaya
 example:
 
 ```

@@ -55,7 +55,7 @@ class Maya:
                                                   from_data=from_data,
                                                   to_date=to_date, page=page)
 
-    def get_price_history(self, security_id: str, from_data: date, to_date: date = date.today(), page: int = 1) -> List[Dict]:
+    def get_price_history(self, security_id: str, from_data: date, to_date: date = date.today(), page: int = 1):
         maya_class = self.get_maya_class(security_id)
         return maya_class.get_price_history(security_id,
                                             from_data=from_data,

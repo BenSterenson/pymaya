@@ -1,9 +1,13 @@
+from typing import Callable, Iterable, Iterator, TypeVar
 from logging import Logger
 import logging
 
 
-def streamify(batch_func):
-    def streamify_wrapper(*args, **kwargs):
+T = TypeVar('T')
+
+
+def streamify(batch_func: Callable[..., Iterable[T]]) -> Callable[..., Iterator[T]]:
+    def streamify_wrapper(*args, **kwargs) -> Iterator[T]:
         kwargs["page"] = kwargs.get("page", 1)
         batch = batch_func(*args, **kwargs)
         while batch:
