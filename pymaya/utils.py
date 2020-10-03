@@ -1,9 +1,10 @@
 from typing import Callable, Iterable, Iterator, TypeVar
+from enum import unique, IntEnum
 from logging import Logger
 import logging
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def streamify(batch_func: Callable[..., Iterable[T]]) -> Callable[..., Iterator[T]]:
@@ -27,3 +28,9 @@ def get_logger(logger_name) -> Logger:
     logger.addHandler(stream_handler)
     logger.setLevel(logging.DEBUG)
     return logger
+
+
+@unique
+class Language(IntEnum):
+    HEBREW = 0
+    ENGLISH = 1
