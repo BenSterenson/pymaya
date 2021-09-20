@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import List, Dict
+from typing import Dict
 from datetime import date
 
 from requests import Session
