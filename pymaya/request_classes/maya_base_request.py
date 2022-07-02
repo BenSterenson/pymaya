@@ -9,6 +9,7 @@ class MayaBaseRequest(ABC):
     def __init__(self, *args, **kwargs):
         self.request = requests.Request(self.method, **kwargs)
         self.request.headers["Cache-Control"] = "no-cache"
+        self.request.headers["referer"] = "https://www.tase.co.il/"
         self.request.headers["User-Agent"] = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; FSL 7.0.6.01001)"
 
     @property
