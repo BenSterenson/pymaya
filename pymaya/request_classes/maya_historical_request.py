@@ -19,8 +19,8 @@ class MayaHistoricalRequest(MayaFundBaseRequest):
     ):
         super(MayaHistoricalRequest, self).__init__(lang, data={})
         self.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
-        self.request.data["DateFrom"] = from_data
-        self.request.data["DateTo"] = to_date
+        self.request.data["DateFrom"] = from_data.isoformat()
+        self.request.data["DateTo"] = to_date.isoformat()
         self.request.data["FundId"] = security_id
         self.request.data["Page"] = page
         self.request.data["Period"] = period
