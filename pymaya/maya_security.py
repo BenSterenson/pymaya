@@ -43,5 +43,9 @@ class MayaSecurity(MayaBase):
         page: int = 1,
         lang: Language = Language.ENGLISH,
     ) -> List[Dict]:
+
+        if not to_date:
+            to_date = date.today()
+
         data = self.get_price_history_chunk(security_id, from_data, to_date, page, lang)
         return data.get("Items", [])
