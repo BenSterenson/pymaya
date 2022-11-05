@@ -7,7 +7,7 @@ from cachetools.keys import hashkey
 
 from pymaya.maya_base import MayaBase
 from pymaya.request_classes.maya_all_securities_request import MayaAllSecuritiesRequest
-from pymaya.request_classes.maya_security_details_request import MayaSecurityDetailsRequest
+from pymaya.request_classes.maya_security_data_request import MayaSecurityDataRequest
 from pymaya.request_classes.maya_security_request import MayaSecurityHistoricalRequest
 from pymaya.utils import streamify, Language
 
@@ -20,14 +20,14 @@ class MayaSecurity(MayaBase):
     @staticmethod
     def get_names(english_details: Dict[str, Any], hebrew_details: Dict[str, Any]):
         return {
-            "english_short_name": english_details.get("CompanyDetails", {}).get("Name", ""),
-            "english_long_name": english_details.get("CompanyDetails", {}).get("Name", ""),
-            "hebrew_short_name": hebrew_details.get("CompanyDetails", "").get("Name", ""),
-            "hebrew_long_name": hebrew_details.get("CompanyDetails", "").get("Name", ""),
+            "english_short_name":english_details.get('Name'),
+            "english_long_name": english_details.get('LongName'),
+            "hebrew_short_name": hebrew_details.get("Name"),
+            "hebrew_long_name": hebrew_details.get("LongName"),
         }
 
     def get_details(self, security_id: str, lang: Language = Language.ENGLISH):
-        return self._send_request(MayaSecurityDetailsRequest(security_id, lang=lang))
+        return self._send_request(MayaSecurityDataRequest(security_id, lang=lang))
 
     def get_price_history_chunk(
         self, security_id: str, from_data: date, to_date: date, page: int, lang: Language = Language.ENGLISH
