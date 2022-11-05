@@ -20,10 +20,10 @@ class MayaSecurity(MayaBase):
     @staticmethod
     def get_names(english_details: Dict[str, Any], hebrew_details: Dict[str, Any]):
         return {
-            "english_short_name":english_details.get('Name'),
-            "english_long_name": english_details.get('LongName'),
+            "english_short_name": english_details.get('Name'),
+            "english_long_name": english_details.get('LongName') or english_details.get('SecurityLongName'),
             "hebrew_short_name": hebrew_details.get("Name"),
-            "hebrew_long_name": hebrew_details.get("LongName"),
+            "hebrew_long_name": hebrew_details.get("LongName") or hebrew_details.get('SecurityLongName'),
         }
 
     def get_details(self, security_id: str, lang: Language = Language.ENGLISH):
