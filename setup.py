@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="pymaya",
-    version="0.3.0",
+    version="0.4.0",
     author="Ben Sterenson",
     author_email="bensterenson@gmail.com",
     description="Python client to interact with maya.tase.co.il",
