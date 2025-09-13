@@ -30,15 +30,15 @@ class MayaSecurity(MayaBase):
         return self._send_request(MayaSecurityDataRequest(security_id, lang=lang))
 
     def get_price_history_chunk(
-        self, security_id: str, from_data: date, to_date: date, page: int, lang: Language = Language.ENGLISH
+        self, security_id: str, from_date: date, to_date: date, page: int, lang: Language = Language.ENGLISH
     ) -> Dict:
-        return self._send_request(MayaSecurityHistoricalRequest(security_id, from_data, to_date, page, lang=lang))
+        return self._send_request(MayaSecurityHistoricalRequest(security_id, from_date, to_date, page, lang=lang))
 
     @streamify
     def get_price_history(
         self,
         security_id: str,
-        from_data: date,
+        from_date: date,
         to_date: date = date.today(),
         page: int = 1,
         lang: Language = Language.ENGLISH,
@@ -47,5 +47,5 @@ class MayaSecurity(MayaBase):
         if not to_date:
             to_date = date.today()
 
-        data = self.get_price_history_chunk(security_id, from_data, to_date, page, lang)
+        data = self.get_price_history_chunk(security_id, from_date, to_date, page, lang)
         return data.get("Items", [])

@@ -11,7 +11,7 @@ class MayaSecurityHistoricalRequest(MayaSecurityBaseRequest):
     def __init__(
         self,
         security_id: str,
-        from_data: date,
+        from_date: date,
         to_date: date,
         page: int = 1,
         p_type: int = 8,
@@ -21,7 +21,7 @@ class MayaSecurityHistoricalRequest(MayaSecurityBaseRequest):
         super(MayaSecurityBaseRequest, self).__init__()
         self.request.headers["Content-Type"] = "application/json"
         self.request.json = {
-            "dFrom": str(from_data),
+            "dFrom": str(from_date),
             "dTo": str(to_date),
             "oId": str(security_id),
             "pageNum": page,
