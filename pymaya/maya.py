@@ -58,20 +58,20 @@ class Maya:
         return maya_class.get_names(english_details, hebrew_details)
 
     def get_price_history_chunk(
-        self, security_id: str, from_data: date, to_date: date, page: int, lang: Language = Language.ENGLISH
+        self, security_id: str, from_date: date, to_date: date, page: int, lang: Language = Language.ENGLISH
     ) -> Dict:
         maya_class = self.get_maya_class(security_id)
         return maya_class.get_price_history_chunk(
-            security_id, from_data=from_data, to_date=to_date, page=page, lang=lang
+            security_id, from_date=from_date, to_date=to_date, page=page, lang=lang
         )
 
     def get_price_history(
         self,
         security_id: str,
-        from_data: date,
+        from_date: date,
         to_date: date = date.today(),
         page: int = 1,
         lang: Language = Language.ENGLISH,
     ):
         maya_class = self.get_maya_class(security_id)
-        return maya_class.get_price_history(security_id, from_data=from_data, to_date=to_date, page=page, lang=lang)
+        return maya_class.get_price_history(security_id, from_date=from_date, to_date=to_date, page=page, lang=lang)

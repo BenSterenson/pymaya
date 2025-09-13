@@ -12,7 +12,7 @@ class MayaHistoricalRequest(MayaFundBaseRequest):
     def __init__(
         self,
         security_id: str,
-        from_data: Optional[date],
+        from_date: Optional[date],
         to_date: Optional[date],
         page: int = 1,
         period: int = 0,
@@ -20,7 +20,7 @@ class MayaHistoricalRequest(MayaFundBaseRequest):
     ):
         super(MayaHistoricalRequest, self).__init__(lang, data={})
         self.request.headers["Content-Type"] = "application/x-www-form-urlencoded"
-        self.request.data["DateFrom"] = from_data.isoformat() if from_data else None
+        self.request.data["DateFrom"] = from_date.isoformat() if from_date else None
         self.request.data["DateTo"] = to_date.isoformat() if to_date else None
         self.request.data["FundId"] = security_id
         self.request.data["Page"] = page
