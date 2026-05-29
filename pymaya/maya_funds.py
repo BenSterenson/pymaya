@@ -1,10 +1,17 @@
-from typing import List, Dict, Any
-from datetime import date
+from typing import List, Dict, Any, Optional, Union
+from datetime import date, datetime
 
 from pymaya.maya_base import MayaBase
 from pymaya.request_classes.maya_fund_details_request import MayaFundDetailsRequest
-from pymaya.request_classes.maya_historical_request import MayaHistoricalRequest
+from pymaya.request_classes.maya_mutual_fund_historical_request import MayaMutualFundHistoricalRequest
 from pymaya.utils import streamify, Language
+
+
+def _to_date(d: Union[date, datetime, None]) -> Optional[date]:
+    """Normalise a date/datetime/None to a plain date."""
+    if d is None:
+        return None
+    return d.date() if isinstance(d, datetime) else d
 
 
 class MayaFunds(MayaBase):
@@ -24,8 +31,8 @@ class MayaFunds(MayaBase):
 
     def get_price_history_chunk(
         self, security_id: str, from_date: date, to_date: date, page: int, lang: Language = Language.ENGLISH
-    ) -> Dict:
-        return self._send_request(MayaHistoricalRequest(security_id, from_date, to_date, page, lang=lang))
+    ) -> List[Dict]:
+        return self._send_request(MayaMutualFundHistoricalRequest(security_id, page=page))
 
     @streamify
     def get_price_history(
@@ -36,5 +43,18 @@ class MayaFunds(MayaBase):
         page: int = 1,
         lang: Language = Language.ENGLISH,
     ) -> List[Dict]:
-        data = self.get_price_history_chunk(security_id, from_date, to_date, page, lang)
-        return data.get("Table", [])
+        chunk = self.get_price_history_chunk(security_id, from_date, to_date, page, lang)
+        if not chunk:
+            return []
+        from_d = _to_date(from_date)
+        to_d = _to_date(to_date)
+        filtered = []
+        for record in chunk:
+            trade_date = date.fromisoformat(record["tradeDate"][:10])
+            if to_d and trade_date > to_d:
+                continue
+            # Records are in descending order; stop paginating once before from_date
+            if from_d and trade_date < from_d:
+                return filtered
+            filtered.append(record)
+        return filtered

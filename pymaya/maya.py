@@ -42,7 +42,8 @@ class Maya:
                 self.mapped_securities[security.get("Id")] = {(security.get("Type"))}
 
     def get_maya_class(self, security_id: str):
-        if MayaFunds.TYPE in self.mapped_securities.get(security_id):
+        security_types = self.mapped_securities.get(security_id)
+        if security_types is None or MayaFunds.TYPE in security_types:
             return self.maya_funds
         else:
             return self.maya_securities
