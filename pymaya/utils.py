@@ -34,3 +34,12 @@ def get_logger(logger_name) -> Logger:
 class Language(IntEnum):
     HEBREW = 0
     ENGLISH = 1
+
+
+@unique
+class FundHistoryPeriod(IntEnum):
+    MONTH = 0
+    HALF_YEAR = 1
+    YEAR = 2
+    FIVE_YEARS = 3
+    CUSTOM = 4  # requires fromDate / toDate in the request body
